@@ -1,0 +1,60 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "docker-build",
+			"label": "docker-build",
+			"platform": "node",
+			"dockerBuild": {
+				"dockerfile": "${workspaceFolder}/Dockerfile.dev",
+				"context": "${workspaceFolder}",
+				"pull": true
+			}
+		},
+		{
+			"type": "docker-run",
+			"label": "docker-run: release",
+			"dependsOn": ["docker-build"],
+			"platform": "node",
+			"dockerRun": {
+				"containerName": "${workspaceFolderBasename}",
+				"command": "npm run dev",
+				"ports": [
+					{ "hostPort": 50051, "containerPort": 50051 },
+					{ "hostPort": 9229, "containerPort": 9229 }
+				],
+				"envFiles": [".env"],
+				"volumes": [
+					{
+						"localPath": "${workspaceFolder}/src",
+						"containerPath": "/app/src"
+					}
+				]
+			}
+		},
+		{
+			"type": "docker-run",
+			"label": "docker-run: debug",
+			"dependsOn": ["docker-build"],
+			"dockerRun": {
+				"containerName": "${workspaceFolderBasename}",
+				"command": "npm run debug",
+				"envFiles": [".env"],
+				"ports": [
+					{ "hostPort": 50051, "containerPort": 50051 },
+					{ "hostPort": 9229, "containerPort": 9229 }
+				],
+
+				"volumes": [
+					{
+						"localPath": "${workspaceFolder}/src",
+						"containerPath": "/app/src"
+					}
+				]
+			},
+			"node": {
+				"enableDebugging": true
+			}
+		}
+	]
+}

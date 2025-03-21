@@ -1,0 +1,16 @@
+# Use an official Node.js image
+FROM node:22.14.0
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package*.json ./
+
+# Copy the rest of your source code
+COPY . .
+
+# Ensure setup.sh is executable after copying everything
+RUN chmod +x setup.sh && ./setup.sh init && ./setup.sh generate-proto
+
+EXPOSE 50051 9229

@@ -1,0 +1,36 @@
+{
+	"name": "boilerplate-ms-node",
+	"version": "0.0.1",
+	"main": "index.ts",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+		"debug": "ts-node-dev --respawn --transpile-only --inspect=0.0.0.0:9229 src/index.ts"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/meeta-app/boilerplate-ms-node.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/meeta-app/boilerplate-ms-node/issues"
+	},
+	"homepage": "https://github.com/meeta-app/boilerplate-ms-node#readme",
+	"description": "",
+	"dependencies": {
+		"@grpc/grpc-js": "^1.13.0",
+		"@grpc/proto-loader": "^0.7.13",
+		"@grpc/reflection": "^1.0.4",
+		"google-protobuf": "^3.21.4",
+		"grpc-tools": "^1.13.0",
+		"ts-protoc-gen": "^0.15.0"
+	},
+	"devDependencies": {
+		"@types/node": "^22.13.10",
+		"ts-node": "^10.9.2",
+		"ts-node-dev": "^2.0.0",
+		"typescript": "^5.8.2"
+	}
+}

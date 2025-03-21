@@ -1,0 +1,38 @@
+{
+	"configurations": [
+		{
+			"name": "Docker - DEBUG",
+			"type": "docker",
+			"request": "launch",
+			"preLaunchTask": "docker-run: debug",
+			"platform": "node",
+			"node": {
+				"address": "localhost",
+				"port": 9229,
+				"remoteRoot": "/app"
+			},
+			"serverReadyAction": {
+				"action": "startDebugging",
+				"name": "",
+				"pattern": ""
+			}
+		},
+		{
+			"name": "Docker - RUN",
+			"type": "docker",
+			"request": "launch",
+			"preLaunchTask": "docker-run: release",
+			"platform": "node",
+			"node": {
+				"address": "localhost",
+				"port": 9229,
+				"remoteRoot": "/app"
+			},
+			"serverReadyAction": {
+				"action": "startDebugging",
+				"name": "",
+				"pattern": ""
+			}
+		}
+	]
+}
