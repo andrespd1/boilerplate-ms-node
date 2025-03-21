@@ -5,7 +5,9 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-		"debug": "ts-node-dev --respawn --transpile-only --inspect=0.0.0.0:9229 src/index.ts"
+		"debug": "ts-node-dev --respawn --transpile-only --inspect=0.0.0.0:9229 src/index.ts",
+		"migrate-dev": "npx prisma migrate dev",
+		"push-schema-dev": "npx prisma db push"
 	},
 	"repository": {
 		"type": "git",
@@ -23,12 +25,15 @@
 		"@grpc/grpc-js": "^1.13.0",
 		"@grpc/proto-loader": "^0.7.13",
 		"@grpc/reflection": "^1.0.4",
+		"@prisma/client": "^6.5.0",
+		"dotenv": "^16.4.7",
 		"google-protobuf": "^3.21.4",
 		"grpc-tools": "^1.13.0",
 		"ts-protoc-gen": "^0.15.0"
 	},
 	"devDependencies": {
 		"@types/node": "^22.13.10",
+		"prisma": "^6.5.0",
 		"ts-node": "^10.9.2",
 		"ts-node-dev": "^2.0.0",
 		"typescript": "^5.8.2"

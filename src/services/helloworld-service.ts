@@ -5,24 +5,35 @@ import {
 } from '@grpc/grpc-js';
 
 import { HelloReply, HelloRequest } from '../proto-generated/helloworld_pb';
+import { prisma } from '../config/db-client';
+import { Table } from '@prisma/client';
 
 /** MUST add function service declaration here, before implementing it in`HelloWorldService` */
 interface IHelloWorldService extends UntypedServiceImplementation {
 	sayHello(
 		call: ServerUnaryCall<HelloRequest, HelloReply>,
 		callback: Function,
-	): void;
+	): Promise<void>;
 }
 
 class HelloWorldService implements IHelloWorldService {
 	[name: string]: UntypedHandleCall;
 
-	public sayHello(
+	public async sayHello(
 		call: ServerUnaryCall<HelloRequest, HelloReply>,
 		callback: Function,
-	): void {
+	): Promise<void> {
+		// Message response from gRPC
 		const reply = new HelloReply();
-		reply.setMessage('Hello ' + call.request.getName());
+
+		// Calling table repository through prisma client
+		const table: Table | null = await prisma.table.findFirst();
+
+		// Setting message response
+		reply.setMessage(
+			`Hello ${call.request.getName()} from gRPC using table: ${table?.name}`,
+		);
+		// Instead of return we use callback for gRPC
 		callback(null, reply);
 	}
 }
