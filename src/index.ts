@@ -6,6 +6,7 @@ import { ReflectionService } from '@grpc/reflection';
 import path from 'path';
 import dotenv from 'dotenv';
 import { connectDbWithRetry } from './config/db-client';
+import { authInterceptor } from './config/interceptor';
 
 async function main() {
 	const PROTOS_BASE = path.join('src', 'protos');
@@ -19,7 +20,7 @@ async function main() {
 	 */
 	const protoFiles = ['helloworld.proto'];
 
-	const server = new grpc.Server();
+	const server = new grpc.Server({ interceptors: [authInterceptor] });
 	connectDbWithRetry();
 	const packageDefinition = protoLoader.loadSync(
 		protoFiles.map((p) => path.join(PROTOS_BASE, p)),
