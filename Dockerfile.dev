@@ -14,3 +14,5 @@ COPY . .
 RUN chmod +x setup.sh && ./setup.sh init && ./setup.sh generate-proto
 
 EXPOSE 50051 9229
+
+CMD [ "./setup.sh", "prisma"]

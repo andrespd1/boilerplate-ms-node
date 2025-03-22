@@ -4,8 +4,9 @@ import { GreeterService } from './proto-generated/helloworld_grpc_pb';
 import HelloWorldService from './services/helloworld-service';
 import { ReflectionService } from '@grpc/reflection';
 import path from 'path';
-import { prisma } from './config/db-client';
 import dotenv from 'dotenv';
+import { connectDbWithRetry } from './config/db-client';
+
 async function main() {
 	const PROTOS_BASE = path.join('src', 'protos');
 	const PORT = 50051;
@@ -19,8 +20,7 @@ async function main() {
 	const protoFiles = ['helloworld.proto'];
 
 	const server = new grpc.Server();
-	await prisma.$connect();
-
+	connectDbWithRetry();
 	const packageDefinition = protoLoader.loadSync(
 		protoFiles.map((p) => path.join(PROTOS_BASE, p)),
 	);
