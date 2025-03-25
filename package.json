@@ -28,7 +28,8 @@
 		"dotenv": "^16.4.7",
 		"google-protobuf": "^3.21.4",
 		"grpc-tools": "^1.13.0",
-		"ts-protoc-gen": "^0.15.0"
+		"ts-protoc-gen": "^0.15.0",
+		"winston": "^3.17.0"
 	},
 	"devDependencies": {
 		"@types/node": "^22.13.10",

@@ -6,7 +6,8 @@ import { ReflectionService } from '@grpc/reflection';
 import path from 'path';
 import dotenv from 'dotenv';
 import { connectDbWithRetry } from './config/db-client';
-import { authInterceptor } from './config/interceptor';
+import { authInterceptor, loggerInterceptor } from './config/grpc-interceptors';
+import logger from './config/logger';
 
 async function main() {
 	const PROTOS_BASE = path.join('src', 'protos');
@@ -14,13 +15,14 @@ async function main() {
 
 	dotenv.config();
 
-	console.log(process.env.DATABASE_URL);
 	/**
 	 * THIS LIST NEEDS TO BE UPDATED WITH ALL PROTO FILES
 	 */
 	const protoFiles = ['helloworld.proto'];
 
-	const server = new grpc.Server({ interceptors: [authInterceptor] });
+	const server = new grpc.Server({
+		interceptors: [authInterceptor, loggerInterceptor],
+	});
 	connectDbWithRetry();
 	const packageDefinition = protoLoader.loadSync(
 		protoFiles.map((p) => path.join(PROTOS_BASE, p)),
@@ -40,7 +42,7 @@ async function main() {
 			if (err != null) {
 				return console.error(err);
 			}
-			console.log(`gRPC listening on ${port}`);
+			logger.info(`gRPC server listening on): ${port}`);
 		},
 	);
 }
