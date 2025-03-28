@@ -6,7 +6,7 @@ import {
 
 import { HelloReply, HelloRequest } from '../proto-generated/helloworld_pb';
 import { prisma } from '../config/db-client';
-import { Table } from '@prisma/client';
+import { StubTableNode } from '@prisma/client';
 
 /** MUST add function service declaration here, before implementing it in`HelloWorldService` */
 interface IHelloWorldService extends UntypedServiceImplementation {
@@ -27,7 +27,7 @@ class HelloWorldService implements IHelloWorldService {
 		const reply = new HelloReply();
 
 		// Calling table repository through prisma client
-		const table: Table | null = await prisma.table.findFirst();
+		const table: StubTableNode | null = await prisma.stubTableNode.findFirst();
 
 		// Setting message response
 		reply.setMessage(

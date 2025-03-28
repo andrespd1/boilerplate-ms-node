@@ -10,10 +10,11 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL_NODE")
 }
 
-model Table {
+model StubTableNode {
+  @@map("stub_table_node")
   id      Int      @id @default(autoincrement())
   name    String
  }
