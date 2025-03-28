@@ -42,7 +42,7 @@ async function main() {
 			if (err != null) {
 				return console.error(err);
 			}
-			logger.info(`gRPC server listening on): ${port}`);
+			logger.info(`gRPC server listening on: ${port}`);
 		},
 	);
 }
