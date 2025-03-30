@@ -1,3 +1,4 @@
 node_modules/
 proto-generated/
 .env
+coverage/
