@@ -8,10 +8,13 @@ import dotenv from 'dotenv';
 import { connectDbWithRetry } from './config/db-client';
 import { authInterceptor, loggerInterceptor } from './config/grpc-interceptors';
 import logger from './config/logger';
+import { initRedis } from './config/redis-client';
 
 async function main() {
 	const PROTOS_BASE = path.join('src', 'protos');
 	const PORT = 50051;
+
+	initRedis();
 
 	dotenv.config();
 
