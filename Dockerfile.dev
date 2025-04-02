@@ -11,8 +11,8 @@ COPY package*.json ./
 COPY . .
 
 # Ensure setup.sh is executable after copying everything
-RUN chmod +x setup.sh && ./setup.sh init && ./setup.sh generate-proto
+RUN chmod +x setup.sh && ./setup.sh init
 
 EXPOSE 50051 9229
 
-CMD [ "./setup.sh", "prisma"]
+CMD [ "./setup.sh", "start"]

@@ -1,105 +1,102 @@
 #!/bin/bash
+# -----------------------------------------------------------------------------
+# setup.sh
+#
+# A script for local development to streamline:
+#   1. Installing dependencies
+#   2. Generating gRPC proto files
+#   3. Managing the local database schema (via Prisma)
+#   4. Starting the dev server
+#
+# Commands:
+#   init     : Install deps and generate proto files (build phase)
+#   db       : Run db push (with retry) after the DB container is up
+#   proto    : (Optional) re-generate gRPC proto files
+#   start    : Start the dev server
+# -----------------------------------------------------------------------------
 
 usage() {
-  echo "Usage: $0 {init|generate-proto|prisma}"
+  echo "Usage: $0 {init|db|proto|start}"
   exit 1
 }
 
-# Require exactly one argument
-if [ "$#" -ne 1 ]; then
-  usage
-fi
+# -----------------------------------------------------------------------------
+# DB PUSH WITH RETRY
+# -----------------------------------------------------------------------------
+db_push_with_retry() {
+  local max_attempts=5
+  local attempt=1
+  local delay=3
 
-if [ "$1" == "init" ]; then
-  echo "Running npm install..."
-  npm install
-
-  echo "Checking for protoc..."
-  if ! command -v protoc &> /dev/null; then
-    echo "protoc not found. Installing protoc..."
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-      echo "Detected Linux. Installing via apt-get..."
-      if command -v sudo &> /dev/null; then
-        sudo apt-get update && sudo apt-get install -y protobuf-compiler
-      else
-        apt-get update && apt-get install -y protobuf-compiler
-      fi
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-      echo "Detected macOS. Installing via Homebrew..."
-      if command -v brew &> /dev/null; then
-        brew install protobuf
-      else
-        echo "Homebrew not found. Please install Homebrew from https://brew.sh/."
-        exit 1
-      fi
+  while [ $attempt -le $max_attempts ]; do
+    echo "Attempt $attempt of $max_attempts: Running 'npx prisma db push'..."
+    if npx prisma db push; then
+      echo "Prisma db push succeeded."
+      return
     else
-      echo "Unknown OS. Please install protoc manually."
-      exit 1
+      echo "Prisma db push failed."
     fi
-  else
-    echo "protoc is already installed."
-  fi
+    echo "Retrying in $delay seconds..."
+    sleep $delay
+    attempt=$(( attempt + 1 ))
+  done
 
-elif [ "$1" == "generate-proto" ]; then
-  echo "Generating proto files..."
-  mkdir -p ./src/proto-generated
-  npx grpc_tools_node_protoc \
-    -I=./src/protos \
-    --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts \
-    --plugin=protoc-gen-grpc=./node_modules/.bin/grpc_tools_node_protoc_plugin \
-    --js_out=import_style=commonjs,binary:./src/proto-generated \
-    --ts_out=service=grpc-node,mode=grpc-js:./src/proto-generated \
-    --grpc_out=grpc_js:./src/proto-generated \
-    ./src/protos/*.proto
+  echo "Prisma db push failed after $max_attempts attempts."
+  exit 1
+}
 
-elif [ "$1" == "prisma" ]; then
-  echo "Starting Prisma setup with retry logic..."
-  max_attempts=5
-  attempt=1
-  delay=2
-
-  if [ "$REMOTE_DB" == "true" ]; then
-    echo "REMOTE_DB is true. Using 'npx prisma pull' to sync schema from remote database."
-    while [ $attempt -le $max_attempts ]; do
-      echo "Attempt $attempt: Trying 'npx prisma pull'..."
-      if npx prisma pull; then
-        echo "Prisma pull succeeded."
-        break
-      else
-        echo "Prisma pull failed."
-      fi
-      echo "Retrying in ${delay} seconds..."
-      sleep $delay
-      attempt=$((attempt + 1))
-    done
-  else
-    echo "REMOTE_DB is not true. Using 'npx prisma db push' to apply schema changes to the database."
-    while [ $attempt -le $max_attempts ]; do
-      echo "Attempt $attempt: Trying 'npx prisma db push'..."
-      if npx prisma db push; then
-        echo "Prisma db push succeeded."
-        break
-      else
-        echo "Prisma db push failed."
-      fi
-      echo "Retrying in ${delay} seconds..."
-      sleep $delay
-      attempt=$((attempt + 1))
-    done
-  fi
-
-  if [ $attempt -gt $max_attempts ]; then
-    echo "Prisma command failed after $max_attempts attempts."
-    exit 1
-  fi
-
-  echo "Starting the development server with 'npm run dev'..."
-  # Use exec to ensure npm run dev receives signals directly (improves shutdown speed)
-  exec npm run dev
-
-else
+if [ $# -ne 1 ]; then
   usage
 fi
 
-echo "Done."
+case "$1" in
+  init)
+    echo "=== INIT: Installing dependencies ==="
+    npm install
+
+    echo "=== INIT: Generating proto files ==="
+    mkdir -p ./src/proto-generated
+    npx grpc_tools_node_protoc \
+      -I=./src/protos \
+      --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts \
+      --plugin=protoc-gen-grpc=./node_modules/.bin/grpc_tools_node_protoc_plugin \
+      --js_out=import_style=commonjs,binary:./src/proto-generated \
+      --ts_out=service=grpc-node,mode=grpc-js:./src/proto-generated \
+      --grpc_out=grpc_js:./src/proto-generated \
+      ./src/protos/*.proto
+
+    echo "=== INIT: Done. You can now run '$0 db' after the DB is up, then '$0 start'. ==="
+    ;;
+
+  db)
+    echo "=== DB: Attempting database schema push (retry logic) ==="
+    db_push_with_retry
+    ;;
+
+  proto)
+    echo "=== PROTO: Generating proto files ==="
+    mkdir -p ./src/proto-generated
+    npx grpc_tools_node_protoc \
+      -I=./src/protos \
+      --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts \
+      --plugin=protoc-gen-grpc=./node_modules/.bin/grpc_tools_node_protoc_plugin \
+      --js_out=import_style=commonjs,binary:./src/proto-generated \
+      --ts_out=service=grpc-node,mode=grpc-js:./src/proto-generated \
+      --grpc_out=grpc_js:./src/proto-generated \
+      ./src/protos/*.proto
+
+    echo "=== PROTO: Done generating gRPC files. ==="
+    ;;
+
+  start)
+    echo "=== START: Running 'db push' then 'npm run dev' ==="
+    db_push_with_retry
+    exec npm run dev
+    ;;
+
+  *)
+    usage
+    ;;
+esac
+
 exit 0

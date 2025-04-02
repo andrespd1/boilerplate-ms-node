@@ -1,16 +1,10 @@
 {
 	"configurations": [
 		{
-			"name": "docker-compose: run",
-			"type": "docker",
-			"request": "launch",
-			"preLaunchTask": "docker-compose: run",
-			"platform": "node",
-			"node": {
-				"address": "localhost",
-				"port": 9229,
-				"remoteRoot": "/app"
-			}
+			"name": "docker-compose: attach",
+			"type": "node",
+			"request": "attach",
+			"remoteRoot": "/app"
 		}
 	]
 }
