@@ -1,1 +1,11 @@
-npm test
+# Run tests – exit if tests fail
+npm test || exit 1
+
+# Run ESLint with auto-fix on all files (adjust the glob as needed)
+npx eslint . --fix || exit 1
+
+# Run Prettier to format files
+npx prettier --write . || exit 1
+
+# Add any auto-fixed changes to staging
+git add .

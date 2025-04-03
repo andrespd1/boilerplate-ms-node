@@ -1,4 +1,4 @@
-import { getCache, setCache } from './redis-client';
+import { getCache, setCache } from '@src/config/redis-client';
 
 /**
  * 1) Attempt to retrieve a cached message from Redis.
@@ -11,22 +11,20 @@ import { getCache, setCache } from './redis-client';
  * @param ttlSeconds   Optional expiration time in seconds
  * @returns            The protobuf message (either cached or newly computed)
  */
-export async function getAndSetCache<
-	T extends { serializeBinary(): Uint8Array },
->(
-	key: string,
-	messageType: { deserializeBinary(data: Uint8Array): T },
-	func: () => Promise<T> | T,
-	ttlSeconds?: number,
+export async function getAndSetCache<T extends { serializeBinary(): Uint8Array }>(
+  key: string,
+  messageType: { deserializeBinary(data: Uint8Array): T },
+  func: () => Promise<T> | T,
+  ttlSeconds?: number,
 ): Promise<T> {
-	// 1) Try to get from cache
-	const cached = await getCache<T>(key, messageType);
-	if (cached) {
-		return cached;
-	}
+  // 1) Try to get from cache
+  const cached = await getCache<T>(key, messageType);
+  if (cached) {
+    return cached;
+  }
 
-	// 2) Cache miss -> compute fresh
-	const fresh = await func();
-	await setCache(key, fresh, ttlSeconds);
-	return fresh;
+  // 2) Cache miss -> compute fresh
+  const fresh = await func();
+  await setCache(key, fresh, ttlSeconds);
+  return fresh;
 }

@@ -1,10 +1,10 @@
 {
-	"configurations": [
-		{
-			"name": "docker-compose: attach",
-			"type": "node",
-			"request": "attach",
-			"remoteRoot": "/app"
-		}
-	]
+  "configurations": [
+    {
+      "name": "docker-compose: attach",
+      "type": "node",
+      "request": "attach",
+      "remoteRoot": "/app"
+    }
+  ]
 }

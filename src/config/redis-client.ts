@@ -3,12 +3,12 @@ import { Buffer } from 'buffer';
 
 /** Helper to encode a Uint8Array to a base64 string. */
 function toBase64(u8: Uint8Array): string {
-	return Buffer.from(u8).toString('base64');
+  return Buffer.from(u8).toString('base64');
 }
 
 /** Helper to decode a base64 string back into a Uint8Array. */
 function fromBase64(b64: string): Uint8Array {
-	return Buffer.from(b64, 'base64');
+  return Buffer.from(b64, 'base64');
 }
 
 /**
@@ -22,13 +22,13 @@ const redisPassword = process.env.REDIS_PASSWORD ?? undefined;
 let redisClient: Redis | null = null;
 
 export function initRedis() {
-	if (!redisClient) {
-		redisClient = new Redis({
-			host: redisHost,
-			port: redisPort,
-			password: redisPassword,
-		});
-	}
+  if (!redisClient) {
+    redisClient = new Redis({
+      host: redisHost,
+      port: redisPort,
+      password: redisPassword,
+    });
+  }
 }
 
 /**
@@ -40,20 +40,20 @@ export function initRedis() {
  * @returns           The same message you passed in (for convenience)
  */
 export async function setCache<T extends { serializeBinary(): Uint8Array }>(
-	key: string,
-	message: T,
-	ttlSeconds?: number,
+  key: string,
+  message: T,
+  ttlSeconds?: number,
 ): Promise<T> {
-	// Convert the protobuf to raw bytes -> base64
-	const bin = message.serializeBinary();
-	const b64 = toBase64(bin);
+  // Convert the protobuf to raw bytes -> base64
+  const bin = message.serializeBinary();
+  const b64 = toBase64(bin);
 
-	if (ttlSeconds) {
-		await redisClient?.set(key, b64, 'EX', ttlSeconds);
-	} else {
-		await redisClient?.set(key, b64);
-	}
-	return message;
+  if (ttlSeconds) {
+    await redisClient?.set(key, b64, 'EX', ttlSeconds);
+  } else {
+    await redisClient?.set(key, b64);
+  }
+  return message;
 }
 
 /**
@@ -64,23 +64,23 @@ export async function setCache<T extends { serializeBinary(): Uint8Array }>(
  * @returns            An instance of `messageType` if found, or `null` if not found.
  */
 export async function getCache<T>(
-	key: string,
-	messageType: { deserializeBinary(data: Uint8Array): T },
+  key: string,
+  messageType: { deserializeBinary(data: Uint8Array): T },
 ): Promise<T | null> {
-	const b64 = await redisClient?.get(key);
-	if (!b64) {
-		return null; // Key doesn't exist
-	}
+  const b64 = await redisClient?.get(key);
+  if (!b64) {
+    return null; // Key doesn't exist
+  }
 
-	// Convert from base64 -> bytes -> message instance
-	const bin = fromBase64(b64);
-	const message = messageType.deserializeBinary(bin);
-	return message;
+  // Convert from base64 -> bytes -> message instance
+  const bin = fromBase64(b64);
+  const message = messageType.deserializeBinary(bin);
+  return message;
 }
 
 /**
  * Delete a key from Redis. Returns the number of keys removed (0 or 1).
  */
 export async function deleteCache(key: string): Promise<number | undefined> {
-	return redisClient?.del(key);
+  return redisClient?.del(key);
 }
