@@ -9,7 +9,7 @@ const loggerFormatter = printf(({ level, message, timestamp, ...meta }) => {
 });
 
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL ?? 'info',
+  level: process.env.LOGGING_LEVEL ?? 'info',
   format: combine(
     timestamp({
       format: 'YYYY-MM-DD HH:mm:ss.SSS',

@@ -22,7 +22,7 @@ When you generate a new microservice from this repository, follow these steps to
 
 1. [Project Structure](#project-structure)
 2. [Setup and Usage: Docker Compose](#setup-and-usage-docker-compose)
-3. [Setup and Usage: Without Docker](#setup-and-usage-no-docker)
+3. [Setup and Usage: Without Docker](#setup-and-usage-without-docker)
 4. [Debugging](#debugging)
 5. [Scripts Overview](#scripts-overview)
 6. [Testing and Coverage](#testing-and-coverage)
@@ -51,7 +51,7 @@ boilerplate-ms-node/
 
 ---
 
-## (RECOMMENDED) Setup and Usage: Docker Compose
+## Setup and Usage: Docker Compose
 
 1. **Clone the Repository**
 
@@ -61,11 +61,17 @@ boilerplate-ms-node/
    ```
 
 2. **Build and Run via Command Line**  
-   If you’re not using VSCode, you can build and run the containers directly from a terminal:
+    You can build and run the containers directly from a terminal:
+
    ```bash
    docker compose up --build -d
    ```
+
    This command will build the Docker images, then run them in detached mode.
+
+   > [!NOTE]  
+   > **Rebuilding Docker Image**  
+   >  You will only need to rebuild the image if you're adding any dependency to the project.
 
 ### Environment Variables
 
@@ -150,7 +156,7 @@ Make sure to set the following environment variables for smooth operation:
 - `REDIS_HOST`: Host address for Redis.
 - `REDIS_PORT`: Port used by Redis.
 - `REDIS_PASSWORD`: Password for Redis (if applicable).
-- `LOG_LEVEL`: Winston log level (e.g., `info`, `debug`, `error`).
-- `NODE_ENV`: Environment identifier (e.g., `development`, `production`).
+- `LOGGING_LEVEL`: Winston log level (e.g., `info`, `debug`, `error`).
+- `NODE_ENV`: Environment identifier (e.g., `dev`, `prd`).
 
 ---
